@@ -161,6 +161,8 @@ class TableCalendar extends StatefulWidget {
   /// Set of Builders for `TableCalendar` to work with.
   final CalendarBuilders builders;
 
+  final TableBorder tableBorder;
+
   TableCalendar({
     Key key,
     @required this.calendarController,
@@ -200,6 +202,7 @@ class TableCalendar extends StatefulWidget {
     this.daysOfWeekStyle = const DaysOfWeekStyle(),
     this.headerStyle = const HeaderStyle(),
     this.builders = const CalendarBuilders(),
+    this.tableBorder,
   })  : assert(calendarController != null),
         assert(availableCalendarFormats.keys.contains(initialCalendarFormat)),
         assert(availableCalendarFormats.length <= CalendarFormat.values.length),
@@ -520,44 +523,72 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
   Widget _buildTable() {
     final daysInWeek = 7;
     final children = <TableRow>[
-      if (widget.calendarStyle.renderDaysOfWeek) _buildDaysOfWeek(),
+      //if (widget.calendarStyle.renderDaysOfWeek) _buildDaysOfWeek(),
     ];
 
     int x = 0;
     while (x < widget.calendarController._visibleDays.value.length) {
-      children.add(_buildTableRow(widget.calendarController._visibleDays.value.skip(x).take(daysInWeek).toList()));
+      children.add(_buildTableRow(widget.calendarController._visibleDays.value
+          .skip(x)
+          .take(daysInWeek)
+          .toList()));
       x += daysInWeek;
     }
 
-    return Table(
-      // Makes this Table fill its parent horizontally
-      defaultColumnWidth: FractionColumnWidth(1.0 / daysInWeek),
-      children: children,
+    return Container(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          _buildDaysOfWeek(),
+          Table(
+            // Makes this Table fill its parent horizontally
+            defaultColumnWidth: FractionColumnWidth(1.0 / daysInWeek),
+            children: children,
+            border: widget.tableBorder,
+          ),
+        ],
+      ),
     );
   }
 
-  TableRow _buildDaysOfWeek() {
-    return TableRow(
-      decoration: widget.daysOfWeekStyle.decoration,
-      children: widget.calendarController._visibleDays.value.take(7).map((date) {
-        final weekdayString = widget.daysOfWeekStyle.dowTextBuilder != null
-            ? widget.daysOfWeekStyle.dowTextBuilder(date, widget.locale)
-            : DateFormat.E(widget.locale).format(date);
-        final isWeekend = widget.calendarController._isWeekend(date, widget.weekendDays);
+  Widget _buildDaysOfWeek() {
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children:
+            widget.calendarController._visibleDays.value.take(7).map((date) {
+              final weekdayString = widget.daysOfWeekStyle.dowTextBuilder !=
+                  null
+                  ? widget.daysOfWeekStyle.dowTextBuilder(date, widget.locale)
+                  : DateFormat.E(widget.locale).format(date);
+              final isWeekend =
+              widget.calendarController._isWeekend(date, widget.weekendDays);
 
-        if (isWeekend && widget.builders.dowWeekendBuilder != null) {
-          return widget.builders.dowWeekendBuilder(context, weekdayString);
-        }
-        if (widget.builders.dowWeekdayBuilder != null) {
-          return widget.builders.dowWeekdayBuilder(context, weekdayString);
-        }
-        return Center(
-          child: Text(
-            weekdayString,
-            style: isWeekend ? widget.daysOfWeekStyle.weekendStyle : widget.daysOfWeekStyle.weekdayStyle,
+              if (isWeekend && widget.builders.dowWeekendBuilder != null) {
+                return widget.builders.dowWeekendBuilder(
+                    context, weekdayString);
+              }
+              if (widget.builders.dowWeekdayBuilder != null) {
+                return widget.builders.dowWeekdayBuilder(
+                    context, weekdayString);
+              }
+              return Container(
+                width: constraints.maxWidth * 1 / 7,
+                child: Text(
+                  weekdayString,
+                  textAlign: TextAlign.center,
+                  style: isWeekend
+                      ? widget.daysOfWeekStyle.weekendStyle
+                      : widget.daysOfWeekStyle.weekdayStyle,
+                ),
+              );
+            }).toList(),
           ),
-        );
-      }).toList(),
     );
   }
 
