@@ -285,7 +285,7 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
   void _onDayLongPressed(DateTime day) {
     if (widget.onDayLongPressed != null) {
       widget.onDayLongPressed(
-        day, 
+        day,
         widget.calendarController.visibleEvents[_getEventKey(day)] ?? [],
         widget.calendarController.visibleHolidays[_getHolidayKey(day)] ?? [],
       );
@@ -562,6 +562,7 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
             mainAxisSize: MainAxisSize.max,
             children:
             widget.calendarController._visibleDays.value.take(7).map((date) {
+              Widget child;
               final weekdayString = widget.daysOfWeekStyle.dowTextBuilder !=
                   null
                   ? widget.daysOfWeekStyle.dowTextBuilder(date, widget.locale)
@@ -570,22 +571,25 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
               widget.calendarController._isWeekend(date, widget.weekendDays);
 
               if (isWeekend && widget.builders.dowWeekendBuilder != null) {
-                return widget.builders.dowWeekendBuilder(
+                child = widget.builders.dowWeekendBuilder(
                     context, weekdayString);
               }
               if (widget.builders.dowWeekdayBuilder != null) {
-                return widget.builders.dowWeekdayBuilder(
+                child = widget.builders.dowWeekdayBuilder(
                     context, weekdayString);
               }
-              return Container(
-                width: constraints.maxWidth * 1 / 7,
-                child: Text(
+              if(child == null){
+                child = Text(
                   weekdayString,
                   textAlign: TextAlign.center,
                   style: isWeekend
                       ? widget.daysOfWeekStyle.weekendStyle
                       : widget.daysOfWeekStyle.weekdayStyle,
-                ),
+                );
+              }
+              return Container(
+                width: constraints.maxWidth * 1 / 7,
+                child: child,
               );
             }).toList(),
           ),
