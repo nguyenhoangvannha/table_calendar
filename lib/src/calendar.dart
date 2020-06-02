@@ -265,13 +265,13 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
 
   void _selectPrevious() {
     setState(() {
-      widget.calendarController._selectPrevious();
+      widget.calendarController.selectPrevious();
     });
   }
 
   void _selectNext() {
     setState(() {
-      widget.calendarController._selectNext();
+      widget.calendarController.selectNext();
     });
   }
 
@@ -541,7 +541,7 @@ class _TableCalendarState extends State<TableCalendar> with SingleTickerProvider
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          _buildDaysOfWeek(),
+          if (widget.calendarStyle.renderDaysOfWeek) _buildDaysOfWeek(),
           Table(
             // Makes this Table fill its parent horizontally
             defaultColumnWidth: FractionColumnWidth(1.0 / daysInWeek),

@@ -243,7 +243,7 @@ class CalendarController {
   String _getFormatButtonText() =>
       _useNextCalendarFormat ? _availableCalendarFormats[_nextFormat()] : _availableCalendarFormats[_calendarFormat.value];
 
-  void _selectPrevious() {
+  void selectPrevious() {
     if (calendarFormat == CalendarFormat.month) {
       _selectPreviousMonth();
     } else if (calendarFormat == CalendarFormat.twoWeeks) {
@@ -256,7 +256,7 @@ class CalendarController {
     _decrementPage();
   }
 
-  void _selectNext() {
+  void selectNext() {
     if (calendarFormat == CalendarFormat.month) {
       _selectNextMonth();
     } else if (calendarFormat == CalendarFormat.twoWeeks) {
